@@ -40,7 +40,6 @@
         button:hover {
             background-color: #0056b3;
         }
-
     </style>
 </head>
 <body>
@@ -48,28 +47,30 @@
     <h1>File Permissions Checker</h1>
     <form id="permissionForm">
         <label for="file_permissions">File Permissions:</label>
-        <input type="text" id="file_permissions" name="file_permissions" placeholder="e.g., rw-r--r--" value="rwxrwxrwx" required>
+        <input type="text" id="file_permissions" name="file_permissions" placeholder="e.g., rw-r--r--" required>
+        <div id="file_permissions_error" class="error-message"></div>
 
         <label for="file_owner">File Owner:</label>
-        <input type="text" id="file_owner" name="file_owner" placeholder="e.g., user1" value="john" required>
+        <input type="text" id="file_owner" name="file_owner" placeholder="e.g., user1" required>
 
         <label for="file_group">File Group:</label>
-        <input type="text" id="file_group" name="file_group" placeholder="e.g., group1" value="john" required>
+        <input type="text" id="file_group" name="file_group" placeholder="e.g., group1" required>
 
         <label for="directory_permissions">Directory Permissions:</label>
-        <input type="text" id="directory_permissions" name="directory_permissions" placeholder="e.g., rwxr-xr-x" value="rwxrwxrwx" required>
+        <input type="text" id="directory_permissions" name="directory_permissions" placeholder="e.g., rwxr-xr-x" required>
+        <div id="directory_permissions_error" class="error-message"></div>
 
         <label for="directory_owner">Directory Owner:</label>
-        <input type="text" id="directory_owner" name="directory_owner" placeholder="e.g., user2" value="john" required>
+        <input type="text" id="directory_owner" name="directory_owner" placeholder="e.g., user2" required>
 
         <label for="directory_group">Directory Group:</label>
-        <input type="text" id="directory_group" name="directory_group" placeholder="e.g., group2" value="john" required>
+        <input type="text" id="directory_group" name="directory_group" placeholder="e.g., group2" required>
 
         <label for="user">User:</label>
-        <input type="text" id="user" name="user" placeholder="e.g., user3" value="john" required>
+        <input type="text" id="user" name="user" placeholder="e.g., user3" required>
 
         <label for="user_groups">User Groups (comma-separated):</label>
-        <input type="text" id="user_groups" name="user_groups" placeholder="e.g., group1,group2" value="john" required>
+        <input type="text" id="user_groups" name="user_groups" placeholder="e.g., group1,group2" required>
 
         <button type="button" onclick="checkPermissions()">Check Permissions</button>
     </form>
@@ -79,6 +80,9 @@
 
 <script>
     function checkPermissions() {
+        document.getElementById("file_permissions_error").textContent = "";
+        document.getElementById("directory_permissions_error").textContent = "";
+
         const filePermissions = document.getElementById('file_permissions').value;
         const fileOwner = document.getElementById('file_owner').value;
         const fileGroup = document.getElementById('file_group').value;
@@ -88,8 +92,22 @@
         const user = document.getElementById('user').value;
         const userGroups = document.getElementById('user_groups').value.split(',');
 
+        if (!isPermValid(filePermissions)) {
+            document.getElementById("file_permissions_error").textContent = "Invalid permissions";
+            return;
+        }
+        if (!isPermValid(directoryPermissions)) {
+            document.getElementById("directory_permissions_error").textContent = "Invalid permissions";
+            return;
+        }
+
         const permissions = simulatePermissions(filePermissions, fileOwner, fileGroup, directoryPermissions, directoryOwner, directoryGroup, user, userGroups);
         displayResult(permissions);
+    }
+
+    // Checks permissions Fields
+    function isPermValid(perm) {
+        return /([r-][w-][x-]){3}/i.test(perm);
     }
 
     function simulatePermissions(filePermissions, fileOwner, fileGroup, directoryPermissions, directoryOwner, directoryGroup, user, userGroups) {
