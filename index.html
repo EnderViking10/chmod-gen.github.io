@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Permissions Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>File Permissions Checker</h1>
+    <form id="permissionForm">
+        <label for="file_permissions">File Permissions:</label>
+        <input type="text" id="file_permissions" name="file_permissions" placeholder="e.g., rw-r--r--" value="rwxrwxrwx" required>
+
+        <label for="file_owner">File Owner:</label>
+        <input type="text" id="file_owner" name="file_owner" placeholder="e.g., user1" value="john" required>
+
+        <label for="file_group">File Group:</label>
+        <input type="text" id="file_group" name="file_group" placeholder="e.g., group1" value="john" required>
+
+        <label for="directory_permissions">Directory Permissions:</label>
+        <input type="text" id="directory_permissions" name="directory_permissions" placeholder="e.g., rwxr-xr-x" value="rwxrwxrwx" required>
+
+        <label for="directory_owner">Directory Owner:</label>
+        <input type="text" id="directory_owner" name="directory_owner" placeholder="e.g., user2" value="john" required>
+
+        <label for="directory_group">Directory Group:</label>
+        <input type="text" id="directory_group" name="directory_group" placeholder="e.g., group2" value="john" required>
+
+        <label for="user">User:</label>
+        <input type="text" id="user" name="user" placeholder="e.g., user3" value="john" required>
+
+        <label for="user_groups">User Groups (comma-separated):</label>
+        <input type="text" id="user_groups" name="user_groups" placeholder="e.g., group1,group2" value="john" required>
+
+        <button type="button" onclick="checkPermissions()">Check Permissions</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    function checkPermissions() {
+        const filePermissions = document.getElementById('file_permissions').value;
+        const fileOwner = document.getElementById('file_owner').value;
+        const fileGroup = document.getElementById('file_group').value;
+        const directoryPermissions = document.getElementById('directory_permissions').value;
+        const directoryOwner = document.getElementById('directory_owner').value;
+        const directoryGroup = document.getElementById('directory_group').value;
+        const user = document.getElementById('user').value;
+        const userGroups = document.getElementById('user_groups').value.split(',');
+
+        const permissions = simulatePermissions(filePermissions, fileOwner, fileGroup, directoryPermissions, directoryOwner, directoryGroup, user, userGroups);
+        displayResult(permissions);
+    }
+
+    function simulatePermissions(filePermissions, fileOwner, fileGroup, directoryPermissions, directoryOwner, directoryGroup, user, userGroups) {
+        let filePerms;
+        let dirPerms;
+
+        // Check if user is owner
+        if (user === fileOwner) filePerms = filePermissions.slice(0,3);
+        // Check if user is in group
+        else if (userGroups.includes(fileGroup)) filePerms = filePermissions.slice(3, 6);
+        else filePerms = filePermissions.slice(6, 9);
+
+        // Check if user is owner
+        if (user === directoryOwner) dirPerms = directoryPermissions.slice(0,3);
+        // Check if user is in group
+        else if (userGroups.includes(directoryGroup)) dirPerms = directoryPermissions.slice(3, 6);
+        else dirPerms = directoryPermissions.slice(6, 9);
+
+        return {
+            Read: filePerms[0] === 'r' && dirPerms[2] === 'x',
+            Modify: filePerms[1] === 'w' && dirPerms[2] === 'x',
+            Create: dirPerms[1] === 'w' && dirPerms[2] === 'x',
+            list_without_metadata: dirPerms[0] === 'r',
+            list_with_metadata: dirPerms[0] === 'r' && dirPerms[2] === 'x',
+            Delete: directoryPermissions[8] === 't' ? dirPerms[1] === 'w' && dirPerms[2] === 'x' && directoryOwner === user : dirPerms[1] === 'w' && dirPerms[2] === 'x',
+            Execute_Script: filePerms[0] === 'r' && filePerms[2] === 'x' && dirPerms[2] === 'x',
+            Execute_Binary: filePerms[2] === 'x' && dirPerms[2] === 'x'
+        }
+    }
+
+    function displayResult(permissions) {
+        const resultContainer = document.getElementById('result');
+        resultContainer.innerHTML = '';
+
+        for (const action in permissions) {
+            const permissionStatus = permissions[action] ? 'Yes' : 'No';
+            const permissionMessage = `${action}: ${permissionStatus}`;
+
+            const permissionElement = document.createElement('p');
+            permissionElement.textContent = permissionMessage;
+
+            resultContainer.appendChild(permissionElement);
+        }
+    }
+
+</script>
+</body>
+</html>
