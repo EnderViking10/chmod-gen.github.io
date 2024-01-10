@@ -107,7 +107,7 @@
 
     // Checks permissions Fields
     function isPermValid(perm) {
-        return /([r-][w-][x-]){3}/i.test(perm);
+        return /([r-][w-][x-t]){3}/i.test(perm);
     }
 
     function simulatePermissions(filePermissions, fileOwner, fileGroup, directoryPermissions, directoryOwner, directoryGroup, user, userGroups) {
