@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Permissions Checker</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -115,16 +114,16 @@
         let dirPerms;
 
         // Check if user is owner
-        if (user === fileOwner) filePerms = filePermissions.slice(0,3);
+        if (user === fileOwner) filePerms = filePermissions.slice(0,3).toLowerCase();
         // Check if user is in group
-        else if (userGroups.includes(fileGroup)) filePerms = filePermissions.slice(3, 6);
-        else filePerms = filePermissions.slice(6, 9);
+        else if (userGroups.includes(fileGroup)) filePerms = filePermissions.slice(3, 6).toLowerCase();
+        else filePerms = filePermissions.slice(6, 9).toLowerCase();
 
         // Check if user is owner
-        if (user === directoryOwner) dirPerms = directoryPermissions.slice(0,3);
+        if (user === directoryOwner) dirPerms = directoryPermissions.slice(0,3).toLowerCase();
         // Check if user is in group
-        else if (userGroups.includes(directoryGroup)) dirPerms = directoryPermissions.slice(3, 6);
-        else dirPerms = directoryPermissions.slice(6, 9);
+        else if (userGroups.includes(directoryGroup)) dirPerms = directoryPermissions.slice(3, 6).toLowerCase();
+        else dirPerms = directoryPermissions.slice(6, 9).toLowerCase();
 
         return {
             Read: filePerms[0] === 'r' && dirPerms[2] === 'x',
@@ -132,7 +131,7 @@
             Create: dirPerms[1] === 'w' && dirPerms[2] === 'x',
             list_without_metadata: dirPerms[0] === 'r',
             list_with_metadata: dirPerms[0] === 'r' && dirPerms[2] === 'x',
-            Delete: directoryPermissions[8] === 't' ? dirPerms[1] === 'w' && dirPerms[2] === 'x' && directoryOwner === user : dirPerms[1] === 'w' && dirPerms[2] === 'x',
+            Delete: directoryPermissions[8] === 't' ? dirPerms[1] === 'w' && dirPerms[2] === 'x' && fileOwner === user : dirPerms[1] === 'w' && dirPerms[2] === 'x',
             Execute_Script: filePerms[0] === 'r' && filePerms[2] === 'x' && dirPerms[2] === 'x',
             Execute_Binary: filePerms[2] === 'x' && dirPerms[2] === 'x'
         }
