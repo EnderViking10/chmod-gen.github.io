@@ -40,6 +40,9 @@
             background-color: #0056b3;
         }
     </style>
+	
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1306320018379332"
+     crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="container">
@@ -115,15 +118,14 @@
 
         // Check if user is owner
         if (user === fileOwner) filePerms = filePermissions.slice(0,3).toLowerCase();
-        // Check if user is in group
         else if (userGroups.includes(fileGroup)) filePerms = filePermissions.slice(3, 6).toLowerCase();
         else filePerms = filePermissions.slice(6, 9).toLowerCase();
 
         // Check if user is owner
         if (user === directoryOwner) dirPerms = directoryPermissions.slice(0,3).toLowerCase();
-        // Check if user is in group
         else if (userGroups.includes(directoryGroup)) dirPerms = directoryPermissions.slice(3, 6).toLowerCase();
         else dirPerms = directoryPermissions.slice(6, 9).toLowerCase();
+        console.log(filePerms, dirPerms, filePermissions, directoryPermissions)
 
         return {
             Read: filePerms[0] === 'r' && dirPerms[2] === 'x',
